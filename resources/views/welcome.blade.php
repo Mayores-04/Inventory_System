@@ -11,26 +11,16 @@
 
 <body class="bg-gray-100 text-gray-900 flex flex-col items-center p-6 lg:p-8">
     <div class="container mx-auto p-6 bg-white shadow-md rounded-lg w-full max-w-[90%]">
-        <h1 class="text-3xl font-bold text-center mb-6">Grades Management</h1>
+        <h1 class="text-3xl font-bold text-center mb-6">Student Management</h1>
 
-        <form id="gradeForm" class="flex flex-col md:flex-row items-center justify-center gap-2 mb-4">
-            <input type="text" id="first_name" placeholder="First Name" required
-                class="border border-gray-300 p-2 rounded flex-grow">
-            <input type="text" id="last_name" placeholder="Last Name" required
-                class="border border-gray-300 p-2 rounded flex-grow">
-            <select id="subject" class="border border-gray-300 p-2 rounded">
-                <option value="">Choose Subject</option>
-                <option value="CP1">Computer Programming 1</option>
-                <option value="CP2">Computer Programming 2</option>
-                <option value="MMW">MMW</option>
-                <option value="CollegeCalculus">College Calculus</option>
-            </select>
-            <input type="number" id="grade" placeholder="Grade" min="0" max="100" required
-                class="border border-gray-300 p-2 rounded w-24">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
-                Add Grade
-            </button>
+        <form id="studentForm" class="flex flex-col md:flex-row items-center justify-center gap-2 mb-4">
+            <input type="text" id="first_name" placeholder="First Name" required class="border border-gray-300 p-2 rounded flex-grow">
+            <input type="text" id="last_name" placeholder="Last Name" required class="border border-gray-300 p-2 rounded flex-grow">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Add Student</button>
         </form>
+
+        <!-- Message Display -->
+        <div id="messageBox" class="hidden text-center py-2 px-4 rounded-md mt-2"></div>
 
         <div class="overflow-x-auto">
             <table class="min-w-full bg-white border border-gray-300 text-center">
@@ -38,85 +28,96 @@
                     <tr class="bg-gray-200">
                         <th class="py-2 px-4 border-b">First Name</th>
                         <th class="py-2 px-4 border-b">Last Name</th>
-                        <th class="py-2 px-4 border-b">Subject</th>
-                        <th class="py-2 px-4 border-b">Grade</th>
                         <th class="py-2 px-4 border-b">Action</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody"></tbody>
+                <tbody id="studentTableBody"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        const apiUrl = "http://127.0.0.1:8000/api/grades";
+        const studentApiUrl = "http://127.0.0.1:8000/api/students";
 
-        function fetchGrades() {
-            axios.get(apiUrl)
+        function showMessage(message, type = "success") {
+            const messageBox = document.getElementById('messageBox');
+            messageBox.textContent = message;
+            messageBox.className = `text-white py-2 px-4 rounded-md mt-2 ${
+                type === "success" ? "bg-green-500" : "bg-red-500"
+            }`;
+            messageBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 3000);
+        }
+
+        function fetchStudents() {
+            axios.get(studentApiUrl)
                 .then(response => {
-                    console.log("✅ Grades fetched:", response.data);
-                    const tableBody = document.getElementById('tableBody');
+                    const tableBody = document.getElementById('studentTableBody');
                     tableBody.innerHTML = '';
 
-                    response.data.forEach(grade => {
+                    if (response.data.length === 0) {
+                        showMessage("No students found.", "error");
+                        return;
+                    }
+
+                    response.data.forEach(student => {
                         const row = document.createElement('tr');
                         row.classList.add('hover:bg-gray-100');
 
                         row.innerHTML = `
-                            <td class="py-2 px-4 border-b">${grade.first_name}</td>
-                            <td class="py-2 px-4 border-b">${grade.last_name}</td>
-                            <td class="py-2 px-4 border-b">${grade.subject}</td>
-                            <td class="py-2 px-4 border-b">${grade.grade}</td>
+                            <td class="py-2 px-4 border-b">${student.first_name}</td>
+                            <td class="py-2 px-4 border-b">${student.last_name}</td>
                             <td class="py-2 px-4 border-b">
-                                <button class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition"
-                                        onclick="deleteGrade('${grade._id}')">
-                                    Edit
-                                </button>
-                                <button class="bg-red-500 text-white py-1 px-3 rounded hover:bg-red-600 transition"
-                                        onclick="deleteGrade('${grade._id}')">
-                                    Delete
-                                </button>
-                                <button class="bg-gray-500 text-white py-1 px-3 rounded hover:bg-gray-600 transition"
-                                        onclick="deleteGrade('${grade._id}')">
-                                    Details
-                                </button>
-                                
+                                <a href="/student/${student.id}" 
+                                    class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition">
+                                    View Details
+                                </a>
                             </td>
                         `;
                         tableBody.appendChild(row);
                     });
                 })
-                .catch(error => console.error("❌ Fetch error:", error));
+                .catch(error => {
+                    showMessage("❌ Error fetching students!", "error");
+                    console.error("Fetch error:", error);
+                });
         }
 
-        document.getElementById('gradeForm').addEventListener('submit', function(event) {
+        document.getElementById('studentForm').addEventListener('submit', function(event) {
             event.preventDefault();
+            
+            const firstName = document.getElementById("first_name").value.trim();
+            const lastName = document.getElementById("last_name").value.trim();
 
-            const first_name = document.getElementById('first_name').value.trim();
-            const last_name = document.getElementById('last_name').value.trim();
-            const subject = document.getElementById('subject').value.trim();
-            const grade = parseInt(document.getElementById('grade').value);
-
-            if (!first_name || !last_name || !subject || isNaN(grade) || grade < 0 || grade > 100) {
-                alert('⚠️ Please enter a valid student name and grade (0-100).');
+            if (!firstName || !lastName) {
+                showMessage("⚠️ First Name and Last Name are required!", "error");
                 return;
             }
+            
+            const studentData = {
+                first_name: firstName,
+                last_name: lastName
+            };
 
-            axios.post(apiUrl, {
-                    first_name,
-                    last_name,
-                    subject,
-                    grade
-                })
-                .then(() => {
-                    alert('✅ Grade added successfully!');
-                    document.getElementById('gradeForm').reset();
-                    fetchGrades();
-                })
-                .catch(error => console.error("❌ Add error:", error));
+            axios.post(studentApiUrl, studentData, {
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(() => {
+                showMessage("✅ Student added successfully!", "success");
+                fetchStudents();
+                document.getElementById('studentForm').reset();
+            })
+            .catch(error => {
+                console.error("Add error:", error.response ? error.response.data : error);
+                showMessage("❌ Failed to add student: " + (error.response?.data?.error || "Unknown error"), "error");
+            });
+
         });
 
-        fetchGrades();
+        fetchStudents();
     </script>
 </body>
 
