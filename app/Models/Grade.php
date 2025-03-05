@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
-use MongoDB\Laravel\Eloquent\Model as Eloquent; // Use the new package
+use MongoDB\Laravel\Eloquent\Model as Eloquent; 
 
 class Grade extends Eloquent
 {
     protected $connection = 'mongodb';
     protected $collection = 'grades';
-    protected $fillable = ['student_name', 'grade'];
+    protected $fillable = ['first_name', 'last_name', 'subject', 'grade'];
 }

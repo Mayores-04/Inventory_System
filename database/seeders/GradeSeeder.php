@@ -10,13 +10,17 @@ class GradeSeeder extends Seeder
     public function run()
     {
         Grade::create([
-            'student_name' => 'Alice Johnson',
+            'first_name' => 'Alice Johnson',
+            'last_name' => 'Alice Johnson',
+            'subject' => 'CP1',
             'grade' => 88
         ]);
 
         Grade::create([
-            'student_name' => 'Bob Smith',
-            'grade' => 92
+            'first_name' => 'Alice Johnson',
+            'last_name' => 'Alice Johnson',
+            'subject' => 'CP2',
+            'grade' => 88
         ]);
     }
 }
