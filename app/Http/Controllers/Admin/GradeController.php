@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Models\Grade;
 use App\Models\Student;
+use Illuminate\Routing\Controller;
+
 
 class GradeController extends Controller
 {

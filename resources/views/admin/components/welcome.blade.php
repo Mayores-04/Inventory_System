@@ -72,7 +72,7 @@
                             <td class="py-2 px-4 border-b">${student.last_name}</td>
                             <td class="py-2 px-4 border-b">
                                 <a href="/student/${student.id}" 
-                                    class="bg-green-500 text-white py-1 px-3 rounded hover:bg-green-600 transition">
+                                    class="bg-green-500 mr-2 text-white py-1 px-3 rounded hover:bg-green-600 transition">
                                     View Details
                                 </a>
                             </td>
@@ -85,6 +85,11 @@
                     console.error("Fetch error:", error);
                 });
         }
+
+        function AddGrade(){
+            alert("g");
+        }
+        
 
         document.getElementById('studentForm').addEventListener('submit', function(event) {
             event.preventDefault();
@@ -116,6 +121,8 @@
             });
 
         });
+
+
 
         fetchStudents();
     </script>

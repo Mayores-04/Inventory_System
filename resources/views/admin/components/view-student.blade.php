@@ -23,12 +23,20 @@
                     <tr class="bg-gray-200">
                         <th class="py-2 px-4 border-b">Subject</th>
                         <th class="py-2 px-4 border-b">Grade</th>
+                        <th class="py-2 px-4 border-b">Action</th>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4 text-2xl">Computer Programming 1</td>
+                        <td class="py-2 px-4 text-2xl"><input type="number" class="text-center"></td>
+                    </tr>
+                    <tr>
+                        <td class="py-2 px-4 text-2xl">Computer Programming 2</td>
+                        <td class="py-2 px-4 text-2xl"><input type="number" class="text-center"></td>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($student->grades as $grade)
                         <tr>
-                            <td class="py-2 px-4 border-b">{{ $grade->subject }}</td>
                             <td class="py-2 px-4 border-b">{{ $grade->grade }}</td>
                         </tr>
                     @empty

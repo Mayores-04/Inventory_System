@@ -1,19 +1,26 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\StudentController;
-use App\Http\Controllers\GradeController;
+use App\Http\Controllers\API\TeacherController;
+use App\Http\Controllers\API\StudentController;
+use App\Http\Controllers\API\AuthController;
 
-// STUDENT ROUTES
-Route::get('/students', [StudentController::class, 'index']);   
-Route::get('/students/{id}', [StudentController::class, 'getStudentData']);  
-Route::post('/students', [StudentController::class, 'store']);   
+// 🛠️ API Authentication
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register']);
 
-// GRADE ROUTES (Linked to a specific student)
-Route::post('/students/{student_id}/grades', [GradeController::class, 'store']); 
-Route::put('/grades/{id}', [GradeController::class, 'update']);  
-Route::delete('/grades/{id}', [GradeController::class, 'destroy']);  
+// 📚 Protected Routes (Only for Authenticated Users)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
+    // 🏫 Admin API Routes
+    Route::apiResource('/admin/teachers', TeacherController::class);
+    Route::apiResource('/admin/students', StudentController::class);
 
+    // 🔑 Logout API
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
-// Route::get('/student/{id}', [StudentController::class, 'viewStudent'])->name('student.view');
